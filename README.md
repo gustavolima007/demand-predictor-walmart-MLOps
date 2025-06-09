@@ -1,4 +1,4 @@
-# 🛍️ Walmart Demand Predictor MLOps: Previsão de Demanda para Categorias Chave de Produtos no Varejo Alimentício 🚀
+s# 🛍️ Walmart Demand Predictor MLOps: Previsão de Demanda para Categorias Chave de Produtos no Varejo Alimentício 🚀
 
 📊 Projeto final da disciplina CET0621 - Aprendizado de Máquina na Análise de Dados (Unicamp - Faculdade de Tecnologia). Este trabalho foca no desenvolvimento de um sistema de previsão de vendas semanais para diferentes categorias de produtos (departamentos) da rede Walmart, utilizando uma abordagem estruturada de aprendizado de máquina.
 
