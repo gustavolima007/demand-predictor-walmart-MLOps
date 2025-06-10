@@ -97,6 +97,3 @@ O modelo Random Forest otimizado alcançou R² de 0.9833, MAE de 1397.38 e RMSE 
 2. **Execução**:
    - Execute o notebook principal (`Previsão_de_Demanda_para_Categorias_Chave_de_Produtos_no_Varejo_Alimentício.ipynb`) no Colab/VS Code.
    - Ajuste os caminhos dos arquivos no código, se necessário.
-
-3. **Saída**:
-   - Previsões salvas em `random_forest_predictions_walmart.csv`.
