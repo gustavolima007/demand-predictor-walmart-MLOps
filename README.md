@@ -1,74 +1,102 @@
-s# 🛍️ Walmart Demand Predictor MLOps: Previsão de Demanda para Categorias Chave de Produtos no Varejo Alimentício 🚀
+# 🛒 Walmart Demand Predictor MLOps: Previsão de Demanda para Categorias Chave no Varejo Alimentício 🚀
 
-📊 Projeto final da disciplina CET0621 - Aprendizado de Máquina na Análise de Dados (Unicamp - Faculdade de Tecnologia). Este trabalho foca no desenvolvimento de um sistema de previsão de vendas semanais para diferentes categorias de produtos (departamentos) da rede Walmart, utilizando uma abordagem estruturada de aprendizado de máquina.
+📊 **Projeto Final da Disciplina CET0621 - Aprendizado de Máquina na Análise de Dados**  
+*Unicamp - Faculdade de Tecnologia*  
+Este projeto desenvolve um sistema de previsão de vendas semanais por categoria (departamento) e loja na rede Walmart, utilizando um pipeline completo de ciência de dados. O objetivo é gerar previsões precisas para otimizar estoques e estratégias no varejo alimentício, seguindo boas práticas de MLOps e reprodutibilidade.
 
 ---
 
-## 📝 Descrição do Projeto
+## 📖 Descrição do Projeto
 
-Este projeto desenvolve um modelo de aprendizado de máquina para prever as vendas semanais por categoria (departamento) e loja na rede Walmart. Utilizando um pipeline completo de ciência de dados – da limpeza à modelagem avançada com dados históricos e contextuais – buscamos gerar previsões precisas para otimizar estoques e o planejamento estratégico no varejo alimentício, seguindo boas práticas de organização e reprodutibilidade.
+Este trabalho implementa um modelo de aprendizado de máquina baseado em Random Forest para prever vendas semanais, integrando dados históricos e contextuais em um pipeline estruturado. Desde a limpeza e engenharia de features até a avaliação e otimização do modelo, o projeto busca oferecer uma solução prática para o desafio de previsão de demanda, reduzindo perdas por excesso ou falta de estoque no varejo alimentício.
 
 ---
 
 ## 🎯 Problema Abordado
 
-A previsão acurada da demanda é vital no varejo alimentício, onde erros geram perdas por excesso de estoque (desperdício) ou por falta de produtos (vendas perdidas e clientes insatisfeitos). Este projeto enfrenta esse desafio aplicando técnicas de regressão do aprendizado de máquina para estimar as vendas semanais por categoria de produto, visando maior eficiência e rentabilidade.
+A previsão precisa da demanda é essencial no varejo alimentício, onde erros podem levar a desperdícios (excesso de estoque) ou perda de vendas e insatisfação do cliente (falta de produtos). Este projeto aborda esse desafio aplicando técnicas de regressão para estimar vendas semanais por departamento, visando melhorar a eficiência operacional e a rentabilidade da rede Walmart.
 
 ---
 
 ## 💾 Dataset Utilizado
 
-O estudo é baseado no dataset "Walmart Recruiting - Store Sales Forecasting", disponibilizado na plataforma Kaggle. Este conjunto de dados oferece um rico histórico contendo:
-* Vendas semanais detalhadas por loja e departamento (nossa proxy para "categoria chave de produto").
-* Características das lojas (ex: tipo, tamanho).
-* Fatores contextuais e promocionais (ex: temperatura, preço do combustível, remarcações promocionais, CPI, taxa de desemprego, indicadores de feriados).
+O projeto utiliza o dataset "Walmart Recruiting - Store Sales Forecasting", disponível na plataforma Kaggle. Este conjunto contém:
+- **Vendas semanais**: Detalhadas por loja e departamento (proxy para categorias de produtos).
+- **Características das lojas**: Tipo (A, B, C) e tamanho.
+- **Fatores contextuais**: Temperatura, preço do combustível, descontos promocionais (MarkDown1-5), Índice de Preços ao Consumidor (CPI), taxa de desemprego, e indicadores de feriados (IsHoliday).
+- **Período**: Treino (fevereiro de 2010 a outubro de 2012) e teste (novembro de 2012 a julho de 2013).
 
-🔗 **Fonte do Dataset:** [Walmart Recruiting - Store Sales Forecasting](https://www.kaggle.com/competitions/walmart-recruiting-store-sales-forecasting/data)
+🔗 **[Fonte do Dataset](https://www.kaggle.com/competitions/walmart-recruiting-store-sales-forecasting/data)**
 
 ---
 
-## 🛠️ Metodologia e Workflow Aplicados
+## 🛠️ Metodologia e Workflow
 
-O projeto seguiu as etapas fundamentais do processo de Descoberta de Conhecimento em Dados (KDD), adaptadas para um fluxo de trabalho de aprendizado de máquina:
+O desenvolvimento seguiu um fluxo de trabalho estruturado baseado no processo de Descoberta de Conhecimento em Dados (KDD), adaptado para MLOps:
 
-1.  **📥 Carregamento e Unificação dos Dados:** Combinação dos arquivos CSV (`train`, `test`, `stores`, `features`) em dataframes estruturados.
-2.  **🧹 Limpeza e Validação de Dados:**
-    * Conversão e validação de tipos de dados (datas, numéricos, etc.).
-    * Tratamento de valores inconsistentes (ex: vendas negativas, markdowns negativos foram ajustados para 0).
-    * Verificação e tratamento de dados duplicados (não foram encontradas duplicatas significativas).
-3.  **🩹 Tratamento de Valores Ausentes (NaNs):**
-    * Preenchimento de NaNs nas colunas `MarkDown1-5` com 0 (indicando ausência de promoção).
-    * Preenchimento de NaNs em `CPI` e `Unemployment` usando estratégias de preenchimento progressivo (`ffill`) e regressivo (`bfill`) agrupados por loja, garantindo consistência temporal.
-4.  **🔄 Transformação de Variáveis:**
-    * Aplicação de One-Hot Encoding para a variável categórica `Type` (tipo de loja).
-    * Conversão da variável booleana `IsHoliday` para formato numérico (0/1).
-5.  **✨ Engenharia de Features (Crucial para Performance):**
-    * **Temporais:** Extração de Ano, Mês, Dia, Semana do Ano, Dia da Semana, Dia do Ano.
-    * **De Lag:** Criação de features baseadas em `Weekly_Sales` de semanas anteriores (ex: lags de 1, 4, 12, 52 semanas) para capturar autocorrelação e sazonalidade.
-    * **De Janela Móvel:** Cálculo de estatísticas (média, mediana, soma, desvio padrão) de `Weekly_Sales` sobre janelas de tempo passadas (ex: janelas de 4, 8, 12, 26, 52 semanas) para capturar tendências recentes e suavizar ruídos.
-    * Tratamento de NaNs introduzidos pela criação de lags e janelas móveis (preenchidos com 0).
-6.  **📊 Divisão Estratégica dos Dados:** Separação do conjunto de treino em um novo subconjunto de treino e um conjunto de validação, utilizando uma abordagem cronológica para simular um cenário de previsão real.
-7.  **🤖 Modelagem Preditiva e Avaliação:**
-    * Definição das variáveis X (features) e y (alvo - `Weekly_Sales`).
-    * Treinamento e avaliação comparativa de múltiplos modelos de regressão:
-        * Regressão Linear (como baseline).
-        * Árvore de Decisão Regressora.
-        * Random Forest Regressor.
-        * Gradient Boosting Regressor.
-    * Avaliação de performance utilizando métricas chave: Erro Médio Absoluto (MAE), Raiz do Erro Quadrático Médio (RMSE) e Coeficiente de Determinação (R²), todas calculadas no conjunto de validação.
-8.  **🚀 Treinamento do Modelo Final e Geração de Previsões:**
-    * Treinamento do modelo de melhor desempenho (Random Forest) utilizando o conjunto de treino completo (treino + validação).
-    * Geração de previsões para o conjunto de teste.
-9.  **📄 Formatação para Submissão:** Preparação do arquivo `random_forest_predictions_walmart.csv` com as previsões finais.
+1. **📥 Carregamento e Integração de Dados**  
+   - Combinação dos arquivos CSV (`train.csv`, `test.csv`, `stores.csv`, `features.csv`) em dataframes unificados.
+
+2. **🧹 Limpeza e Validação**  
+   - Validação de tipos de dados (datas, numéricos).
+   - Correção de valores inconsistentes (ex.: vendas e markdowns negativos ajustados para 0).
+   - Ausência de duplicatas significativas detectada.
+
+3. **🩹 Tratamento de Valores Ausentes (NaNs)**  
+   - Preenchimento de `MarkDown1-5` com 0 (ausência de promoções).
+   - Uso de preenchimento progressivo (`ffill`) e regressivo (`bfill`) agrupado por loja para `CPI` e `Unemployment`, preservando a consistência temporal.
+
+4. **🔄 Transformação de Variáveis**  
+   - One-Hot Encoding para `Type` (gerando `Type_A`, `Type_B`, `Type_C`).
+   - Conversão de `IsHoliday` para formato numérico (0/1).
+
+5. **✨ Engenharia de Features**  
+   - **Temporais**: Extração de `Year`, `Month`, `Day`, `WeekOfYear`, `DayOfWeek`, `DayOfYear`.
+   - **Lags**: Features baseadas em `Weekly_Sales` de semanas anteriores (ex.: lags de 1, 4, 12, 52 semanas) para capturar autocorrelação e sazonalidade.
+   - **Janelas Móveis**: Estatísticas (média, mediana, soma, desvio padrão) sobre janelas de 4, 8, 12, 26 e 52 semanas para identificar tendências.
+   - Tratamento de NaNs resultantes com preenchimento por 0.
+
+6. **📊 Divisão dos Dados**  
+   - Separação cronológica em treino (2010-02-05 a 2012-07-06), validação (2012-07-13 a 2012-10-26) e teste (novembro de 2012 a julho de 2013), simulando cenários reais.
+
+7. **🤖 Modelagem e Avaliação**  
+   - Modelos testados: Regressão Linear, Árvore de Decisão, Random Forest, Gradient Boosting.
+   - Métricas de avaliação: MAE, RMSE e R² no conjunto de validação.
+   - Random Forest otimizado com `n_estimators=30`, `max_depth=7`, etc., via RandomizedSearchCV.
+
+8. **🚀 Treinamento Final e Previsões**  
+   - Retrainamento com conjunto completo e geração de previsões para o teste.
+   - Exportação do arquivo `random_forest_predictions_walmart.csv`.
+
+---
+
+## 📈 Resultados
+
+O modelo Random Forest otimizado alcançou R² de 0.9833, MAE de 1397.38 e RMSE de 2825.27 no conjunto de validação, superando os baselines. A validação cruzada de 5-fold apresentou RMSE de 5938.36 (±910.41), indicando robustez. Features como `Weekly_Sales_lag_1` e `Weekly_Sales_roll_mean_4` foram as mais influentes, capturando padrões temporais. Apesar da alta precisão, uma skewness de 1.66 nos resíduos sugere leve subestimação em vendas altas, apontando áreas para refinamento.
 
 ---
 
 ## 💻 Tecnologias e Bibliotecas
 
-* **Linguagem:** Python 3.x
-* **Bibliotecas Centrais:**
-    * `pandas`: Para manipulação e análise eficiente de dados tabulares.
-    * `numpy`: Para operações numéricas e suporte a arrays.
-    * `scikit-learn`: Para pré-processamento, implementação dos modelos de machine learning e cálculo das métricas de avaliação.
-    * `matplotlib` e `seaborn`: Para a criação de visualizações e gráficos.
-* **Ambiente de Desenvolvimento:** Google Colaboratory (Colab) e VS Code
+- **Linguagem**: Python 3.13.4
+- **Bibliotecas**:
+  - `pandas`: Manipulação de dados tabulares.
+  - `numpy`: Operações numéricas.
+  - `scikit-learn`: Modelagem e métricas.
+  - `matplotlib` e `seaborn`: Visualizações.
+- **Ambiente**: Google Colab e VS Code.
+
+---
+
+## 📋 Instruções de Uso
+
+1. **Pré-requisitos**:
+   - Instale as dependências: `pip install -r requirements.txt` (crie um `requirements.txt` com as bibliotecas listadas).
+   - Faça o clone do repositorio.
+
+2. **Execução**:
+   - Execute o notebook principal (`Previsão_de_Demanda_para_Categorias_Chave_de_Produtos_no_Varejo_Alimentício.ipynb`) no Colab/VS Code.
+   - Ajuste os caminhos dos arquivos no código, se necessário.
+
+3. **Saída**:
+   - Previsões salvas em `random_forest_predictions_walmart.csv`.
